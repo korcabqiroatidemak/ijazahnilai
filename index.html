@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>HALAMAN NILAI (Skrip 005 v5 - Final Polish)</title>
+    <title>HALAMAN NILAI (Skrip 005 v6 - Final Fix)</title>
     <style>
         /* ================= SETTING KERTAS F4 ================= */
         @page { size: 215mm 330mm; margin: 0; }
@@ -50,54 +50,39 @@
             print-color-adjust: exact !important;
         }
         
-        /* LAPIS 1: AREA CETAK (Margin Fisik) */
+        /* LAPIS 1: MARGIN JILID & BORDER */
         .printable-area {
             position: absolute;
-            top: 0.5cm; right: 0.5cm; bottom: 0.5cm; left: 0.7cm; /* Margin Jilid */
+            top: 0.5cm; right: 0.5cm; bottom: 0.5cm; left: 0.7cm; 
             background-image: url('Border belakang.png');
-            background-size: 100% 100%; /* FORCE FIT */
+            background-size: 100% 100%; 
             background-repeat: no-repeat;
         }
 
-        /* LAPIS 2: KONTEN (Safe Zone Logo 8cm) */
+        /* LAPIS 2: KONTEN (Safe Zone 8cm) */
         .content-overlay {
             position: relative; width: 100%; height: 100%;
-            padding: 8cm 2cm 1cm 2cm; /* Top 8cm, Bawah dikurangi jadi 1cm agar muat */
+            padding: 8cm 2cm 0 2cm; /* Top 8cm, Bottom 0 karena footer manual */
             box-sizing: border-box; display: flex; flex-direction: column;
         }
         
-        /* HEADER - DIPERSEMPIT JARAKNYA */
-        .header-section { text-align: center; margin-bottom: 10px; } /* Jarak dipersempit */
+        /* HEADER */
+        .header-section { text-align: center; margin-bottom: 10px; }
         .main-title { font-size: 16pt; font-weight: bold; text-transform: uppercase; margin-bottom: 0px; letter-spacing: 1px; }
         .sub-title { font-size: 14pt; font-weight: bold; text-transform: uppercase; margin-bottom: 2px; }
         .periode-title { font-size: 14pt; font-weight: bold; text-transform: uppercase; margin-bottom: 5px; }
 
-        /* Tabel Identitas - RAPI & RAPAT */
-        .identity-table { 
-            margin-left: 20px; margin-bottom: 8px; /* Jarak ke tabel nilai dipersempit */
-            font-size: 12pt; font-weight: bold; 
-        }
+        /* IDENTITAS (Rapat) */
+        .identity-table { margin-left: 20px; margin-bottom: 8px; font-size: 12pt; font-weight: bold; }
         .identity-table td { padding: 2px 0; vertical-align: top; border: none; }
         .label-cell { width: 110px; }
         .sep-cell { width: 15px; text-align: center; }
 
-        /* TABEL NILAI - COMPACT MODE */
-        .table-container { margin-top: 5px; padding: 0 10px; flex-grow: 1; }
+        /* TABEL NILAI (Compact) */
+        .table-container { margin-top: 5px; padding: 0 10px; }
         table.nilai-table { width: 100%; border-collapse: collapse; border: 2px solid #000; }
-        
-        /* Header Tabel Tetap Gagah */
-        table.nilai-table th { 
-            border: 1px solid #000; padding: 4px; font-size: 12pt; 
-            text-align: center; font-weight: bold; height: 32px; 
-            vertical-align: middle; background-color: transparent; 
-        }
-        
-        /* Isi Tabel Lebih Ramping (Compact) */
-        table.nilai-table td { 
-            border: 1px solid #000; padding: 3px 6px; font-size: 12pt; /* Padding dikurangi */
-            height: 24px; /* Tinggi baris dipaksa lebih kecil */
-            vertical-align: middle; 
-        }
+        table.nilai-table th { border: 1px solid #000; padding: 4px; font-size: 12pt; text-align: center; font-weight: bold; height: 32px; vertical-align: middle; background-color: transparent; }
+        table.nilai-table td { border: 1px solid #000; padding: 3px 6px; font-size: 12pt; height: 24px; vertical-align: middle; }
         
         .col-no { width: 40px; text-align: center; }
         .col-materi { text-align: left; padding-left: 15px; }
@@ -106,41 +91,45 @@
         .row-total { font-weight: bold; background-color: #f9f9f9; }
         .total-label { text-align: center; }
 
-        /* FOOTER TITIMANGSA (STYLE V19 - Stacked & Aligned) */
-        /* Container untuk menampung Tumpukan Tanggal & TTD */
-        .footer-wrapper {
-            margin-top: 5px; /* Jarak dari tabel */
-            display: flex; flex-direction: column; 
-            align-items: flex-end; /* Dorong ke Kanan */
-            padding-right: 20px;
-        }
-
-        /* Tumpukan Tanggal */
-        .titimangsa-block {
-            display: flex; align-items: center; justify-content: flex-end;
-            font-size: 12pt; margin-bottom: 5px;
-        }
-        .kota-part { margin-right: 10px; }
-        .date-stack { display: flex; flex-direction: column; align-items: center; min-width: 170px; }
-        .hr-divider { width: 100%; height: 0; border-bottom: 1px solid black; margin: 3px 0; }
-
-        /* Blok Tanda Tangan (Center terhadap Tanggal) */
-        .sign-box { 
-            width: 300px; /* Lebar area TTD */
-            text-align: center; 
-            margin-right: -60px; /* Kompensasi visual agar lurus dengan stack tanggal */
-            /* Menggunakan margin-right negatif sedikit atau padding-right pada wrapper */
-            /* Alternatif: Kita buat wrapper khusus yang center */
-        }
+        /* ================= FOOTER FIX (ALIGNMENT & SPACING) ================= */
         
-        /* Perbaikan Alignment V19: Kotak TTD lurus dengan Stack Tanggal */
-        .right-aligned-container {
-            display: flex; flex-direction: column; align-items: center;
-            min-width: 250px;
+        /* Wrapper Utama: Menampung seluruh blok footer */
+        .footer-wrapper {
+            margin-top: 24pt; /* FIX: Jarak 24pt dari Tabel */
+            padding-right: 20px;
+            display: flex; 
+            flex-direction: column; 
+            align-items: flex-end; /* Rata Kanan Halaman */
         }
 
+        /* Blok Tanggal: Flex Row agar "Demak" ada di kiri Tumpukan Tanggal */
+        .date-row {
+            display: flex; 
+            align-items: center; /* Center Vertikal (Garis lurus dengan Demak) */
+            justify-content: flex-end;
+        }
+
+        .kota-text { 
+            margin-right: 10px; 
+            font-size: 12pt;
+        }
+
+        /* Kolom Imajiner 320px: Mengunci Tumpukan Tanggal & Tanda Tangan agar lurus */
+        .center-column-stack {
+            width: 320px; /* Lebar area tanda tangan */
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Center Horizontal dalam kolom 320px */
+            text-align: center;
+        }
+
+        /* Elemen dalam Stack */
+        .date-stack-inner { width: 100%; display: flex; flex-direction: column; align-items: center; font-size: 12pt; }
+        .hr-divider { width: 180px; height: 0; border-bottom: 1px solid black; margin: 3px 0; }
+        
+        .sign-spacer { height: 15px; } /* Jarak tanggal ke jabatan */
         .jabatan { font-size: 12pt; font-weight: bold; margin-bottom: 2px; }
-        .korcab { font-size: 12pt; font-weight: normal; margin-bottom: 70px; } /* Ruang TTD */
+        .korcab { font-size: 12pt; font-weight: normal; margin-bottom: 75px; } /* Ruang TTD */
         .pejabat { font-size: 12pt; font-weight: bold; text-decoration: underline; }
 
         /* INFO HALAMAN */
@@ -157,7 +146,7 @@
 <body>
 
 <div class="control-panel">
-    <h3>PANEL KONTROL HALAMAN NILAI - Skrip 005 v5 (Compact)</h3>
+    <h3>PANEL KONTROL HALAMAN NILAI - Skrip 005 v6 (Final Layout Fix)</h3>
     
     <div class="row">
         <div class="group" style="flex: 2;">
@@ -224,12 +213,9 @@
     let dbCSV = [];
     const DEFAULT_ROLE = "Ketua Pelaksana EBTAQ";
 
-    // --- INISIALISASI ---
     window.onload = () => {
         document.getElementById('cfg-m-date').value = new Date().toISOString().split('T')[0];
-        
-        // Load Auto-Save
-        const saved = JSON.parse(localStorage.getItem('ebtaq_005_v5_mem')) || {};
+        const saved = JSON.parse(localStorage.getItem('ebtaq_005_v6_mem')) || {};
         if(saved.eventName) document.getElementById('cfg-event-name').value = saved.eventName;
         if(saved.smartMonth) document.getElementById('cfg-smart-month').value = saved.smartMonth;
         if(saved.hDate) document.getElementById('cfg-h-date').value = saved.hDate;
@@ -247,7 +233,6 @@
         document.getElementById('toggle-status').innerText = isPuluhan ? "Puluhan (85)" : "Desimal (8.5)";
     }
 
-    // --- CSV READER ---
     function readCSV() {
         const file = document.getElementById('csv-input').files[0];
         const reader = new FileReader();
@@ -255,28 +240,22 @@
             const raw = e.target.result;
             const lines = raw.split(/\r?\n/).filter(l => l.trim() !== "");
             const delimiter = lines[0].includes(';') ? ';' : ','; 
-            
             const headers = lines[0].split(delimiter).map(h => h.replace(/"/g, '').trim().toUpperCase());
-            
             dbCSV = lines.slice(1).map(line => {
                 const cols = line.split(delimiter).map(c => c.replace(/"/g, '').trim());
-                let obj = {}; 
-                cols.forEach((v, i) => { if(headers[i]) obj[headers[i]] = v; });
+                let obj = {}; cols.forEach((v, i) => { if(headers[i]) obj[headers[i]] = v; });
                 return obj;
             });
-
             const listLembaga = [...new Set(dbCSV.map(d => d['ASAL LEMBAGA']))].filter(x => x).sort();
             const sel = document.getElementById('sel-lembaga');
             sel.innerHTML = '<option value="">-- Pilih Lembaga --</option>';
             listLembaga.forEach(l => sel.innerHTML += `<option value="${l}">${l}</option>`);
             sel.disabled = false;
-            
             alert(`CSV Berhasil Dimuat: ${dbCSV.length} Data.`);
         };
         reader.readAsText(file);
     }
 
-    // --- HELPERS ---
     function formatMasehiDate(ds) {
         if(!ds) return "";
         const b = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
@@ -290,24 +269,18 @@
         let hasil = "";
         let intPart = Math.floor(n);
         let decPart = Math.round((n - intPart) * 100);
-
         if (intPart < 12) { hasil = " " + angka[intPart]; }
         else if (intPart < 20) { hasil = terbilang(intPart - 10) + " Belas"; }
         else if (intPart < 100) { hasil = terbilang(Math.floor(intPart / 10)) + " Puluh" + terbilang(intPart % 10); }
         else if (intPart < 200) { hasil = " Seratus" + terbilang(intPart - 100); }
         else if (intPart < 1000) { hasil = terbilang(Math.floor(intPart / 100)) + " Ratus" + terbilang(intPart % 100); }
-
         if (decPart > 0) {
              let decStr = n.toString().split('.')[1];
-             if(decStr) {
-                 hasil += " Koma";
-                 for(let char of decStr) { hasil += " " + angka[parseInt(char)]; }
-             }
+             if(decStr) { hasil += " Koma"; for(let char of decStr) { hasil += " " + angka[parseInt(char)]; } }
         }
         return hasil.trim();
     }
 
-    // --- GENERATE ---
     function generate() {
         if (dbCSV.length === 0) return alert("Upload CSV dulu!");
         const targetLembaga = document.getElementById('sel-lembaga').value;
@@ -335,9 +308,8 @@
         const fullTitimangsaH = `${hDate} ${titiMonth} ${hYear} H`;
         const fullTitimangsaM = formatMasehiDate(mDateRaw);
 
-        // Save Memory
         const saveData = { eventName, smartMonth: smartMonthRaw, hDate, hYear, signerName, signerRole, scaleMode: isPuluhan };
-        localStorage.setItem('ebtaq_005_v5_mem', JSON.stringify(saveData));
+        localStorage.setItem('ebtaq_005_v6_mem', JSON.stringify(saveData));
 
         const filteredData = dbCSV.filter(d => d['ASAL LEMBAGA'] === targetLembaga && (d['L / TL'] === 'L' || d['L/TL'] === 'L'));
         const totalPages = filteredData.length;
@@ -357,24 +329,19 @@
             const finalNoEbtaq = sliceID.padStart(4, '0');
             const namaSiswa = (d['NAMA LENGKAP'] || "").toUpperCase();
 
-            let totalNilai = 0;
-            let countMateri = 0;
-            let rowsHTML = "";
-
+            let totalNilai = 0; let countMateri = 0; let rowsHTML = "";
             mapMateri.forEach((m, i) => {
                 let valRaw = d[m.key] || "0";
                 let valNum = parseFloat(valRaw.replace(',', '.'));
                 let displayNum = isPuluhan ? Math.round(valNum * 10) : valNum;
                 let textTerbilang = terbilang(displayNum);
-                totalNilai += displayNum;
-                countMateri++;
+                totalNilai += displayNum; countMateri++;
                 let showVal = isPuluhan ? displayNum : displayNum.toString().replace('.', ',');
                 rowsHTML += `<tr><td class="col-no">${i+1}.</td><td class="col-materi">${m.label}</td><td class="col-angka">${showVal}</td><td class="col-huruf">${textTerbilang}</td></tr>`;
             });
 
             let avg = totalNilai / countMateri;
             let avgRounded = Math.round(avg * 100) / 100;
-            
             let showTotal = isPuluhan ? totalNilai : totalNilai.toString().replace('.', ',');
             let showAvg = avgRounded.toString().replace('.', ',');
             let textTotal = terbilang(totalNilai);
@@ -408,19 +375,24 @@
                         </div>
 
                         <div class="footer-wrapper">
-                            <div class="titimangsa-block">
-                                <div class="kota-part">Demak,</div>
-                                <div class="right-aligned-container">
-                                    <div class="date-stack">
+                            <div class="date-row">
+                                <div class="kota-text">Demak,</div>
+                                <div class="center-column-stack">
+                                    <div class="date-stack-inner">
                                         <div>${fullTitimangsaH}</div>
                                         <div class="hr-divider"></div>
                                         <div>${fullTitimangsaM}</div>
                                     </div>
-                                    <div style="height: 10px;"></div> <div class="jabatan">${signerRole}</div>
+                                </div>
+                            </div>
+                            <div class="date-row">
+                                <div class="kota-text" style="visibility:hidden">Demak,</div> <div class="center-column-stack">
+                                    <div class="sign-spacer"></div>
+                                    <div class="jabatan">${signerRole}</div>
                                     <div class="korcab">Korcab Qiroati Demak</div>
                                     <div class="pejabat">${signerName}</div>
                                 </div>
-                            </div>
+                             </div>
                         </div>
 
                     </div>
