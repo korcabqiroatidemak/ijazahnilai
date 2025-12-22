@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>HALAMAN NILAI EBTAQ - Skrip 005 v1</title>
+    <style>
+        /* Ukuran Kertas F4 (215mm x 330mm) */
+        @page { size: 215mm 330mm; margin: 0; }
+        body { 
+            margin: 0; padding: 0; background-color: #525659; 
+            font-family: "Times New Roman", serif; 
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        /* ================= PANEL KONTROL ================= */
+        .control-panel {
+            background: #fff; width: 215mm; margin: 20px auto;
+            padding: 25px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            display: block; box-sizing: border-box;
+        }
+        .control-panel h3 { margin: 0 0 15px; color: #007bff; font-family: Arial; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        .row { display: flex; gap: 15px; margin-bottom: 15px; align-items: flex-end; }
+        .group { flex: 1; display: flex; flex-direction: column; gap: 5px; }
+        label { font-size: 11px; font-weight: bold; font-family: Arial; color: #555; }
+        input, select { padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px; }
+        .hint { font-size: 10px; color: #666; font-style: italic; margin-top: -3px; }
+
+        /* Toggle Button Style */
+        .toggle-container { display: flex; align-items: center; background: #eee; padding: 5px; border-radius: 4px; border: 1px solid #ccc; }
+        .toggle-label { font-size: 12px; font-weight: bold; margin-right: 10px; color: #333; }
+        .switch { position: relative; display: inline-block; width: 50px; height: 24px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px; }
+        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: #2196F3; }
+        input:checked + .slider:before { transform: translateX(26px); }
+        .status-text { margin-left: 10px; font-size: 12px; font-weight: bold; color: #2196F3; }
+
+        .btn-gen { width: 100%; padding: 15px; background: #28a745; color: #fff; border: none; cursor: pointer; font-weight: bold; border-radius: 4px; font-size: 16px; margin-top: 10px; }
+
+        /* ================= KANVAS HALAMAN ================= */
+        .page-canvas {
+            width: 215mm; height: 330mm; margin: 10mm auto;
+            background-color: white; position: relative;
+            box-sizing: border-box; overflow: hidden;
+            page-break-after: always;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+        .printable-area {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background-image: url('Border belakang.png');
+            background-size: 100% 100%; background-repeat: no-repeat;
+            padding: 2.5cm 2cm 2cm 2cm; /* Area aman konten */
+        }
+        
+        /* HEADER IDENTITAS */
+        .header-section { text-align: center; margin-top: 2cm; margin-bottom: 20px; }
+        .main-title { font-size: 16pt; font-weight: bold; text-transform: uppercase; margin-bottom: 2px; letter-spacing: 1px; }
+        .sub-title { font-size: 14pt; font-weight: bold; text-transform: uppercase; margin-bottom: 2px; }
+        .periode-title { font-size: 14pt; font-weight: bold; text-transform: uppercase; margin-bottom: 20px; }
+
+        .identity-box { margin-left: 20px; font-size: 12pt; font-weight: bold; line-height: 1.6; text-align: left; }
+
+        /* TABEL NILAI */
+        .table-container { margin-top: 15px; padding: 0 10px; }
+        table { width: 100%; border-collapse: collapse; border: 2px solid #000; }
+        th, td { border: 1px solid #000; padding: 6px 8px; font-size: 12pt; }
+        th { text-align: center; font-weight: bold; background-color: transparent; height: 35px; vertical-align: middle; }
+        td { height: 28px; vertical-align: middle; }
+        
+        .col-no { width: 40px; text-align: center; }
+        .col-materi { text-align: left; padding-left: 15px; }
+        .col-angka { width: 100px; text-align: center; font-weight: bold; }
+        .col-huruf { width: 250px; text-align: left; padding-left: 15px; font-style: italic; text-transform: capitalize; }
+        
+        .row-total { font-weight: bold; background-color: #f9f9f9; }
+        .total-label { text-align: center; }
+
+        /* FOOTER & TTD */
+        .footer-section { margin-top: 30px; display: flex; justify-content: flex-end; padding-right: 20px; }
+        .sign-box { text-align: center; width: 320px; }
+        .titimangsa { font-size: 12pt; margin-bottom: 5px; }
+        .hr-div { width: 100%; border-bottom: 1px solid #000; margin: 2px 0; }
+        .jabatan { font-size: 12pt; font-weight: bold; margin-bottom: 2px; }
+        .korcab { font-size: 12pt; font-weight: normal; margin-bottom: 70px; } /* Jarak TTD */
+        .pejabat { font-size: 12pt; font-weight: bold; text-decoration: underline; }
+
+        /* INFO HALAMAN LAYAR */
+        .page-info { position: absolute; bottom: 5mm; left: 10mm; font-size: 9pt; color: #ccc; font-family: Arial; }
+
+        @media print {
+            body { background: none; padding: 0; }
+            .control-panel { display: none !important; }
+            .page-canvas { margin: 0; box-shadow: none; }
+            .page-info { display: none !important; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="control-panel">
+    <h3>PANEL DAFTAR NILAI (HAL. BELAKANG) - Skrip 005 v1</h3>
+    
+    <div class="row">
+        <div class="group">
+            <label>1. Upload CSV</label>
+            <input type="file" id="csv-input" accept=".csv" onchange="readCSV()">
+        </div>
+        <div class="group">
+            <label>2. No. Urut (Kosong = Auto CSV)</label>
+            <input type="number" id="cfg-no-start" placeholder="Ambil dari kolom NO">
+        </div>
+        <div class="group">
+            <label>3. Mode Skala Nilai</label>
+            <div class="toggle-container">
+                <span class="toggle-label">Desimal</span>
+                <label class="switch">
+                    <input type="checkbox" id="scale-toggle" onchange="updateToggleText()">
+                    <span class="slider"></span>
+                </label>
+                <span class="status-text" id="toggle-status">Desimal (8.5)</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="group">
+            <label>4. Judul Kegiatan</label>
+            <input type="text" id="cfg-event-name" value="EVALUASI BELAJAR TAHAP AKHIR QIROATI (EBTAQ)">
+        </div>
+        <div class="group">
+            <label>5. Input Bulan Cerdas (Periode / Titimangsa)</label>
+            <input type="text" id="cfg-smart-month" placeholder="Cth: Rojab ATAU Rojab / Sya'ban">
+            <div class="hint">Format: "Periode" ATAU "Periode / Titimangsa"</div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="group">
+            <label>6. Tahun Hijriyah</label>
+            <input type="text" id="cfg-h-year" placeholder="1446 H">
+        </div>
+        <div class="group">
+            <label>7. Tanggal Masehi (Titimangsa)</label>
+            <input type="date" id="cfg-m-date">
+        </div>
+        <div class="group">
+            <label>8. Nama Penandatangan</label>
+            <input type="text" id="cfg-signer-name" placeholder="Nama Ketua Pelaksana">
+        </div>
+        <div class="group">
+            <label>Jabatan Penandatangan</label>
+            <input type="text" id="cfg-signer-role" placeholder="Ketua Pelaksana EBTAQ">
+        </div>
+    </div>
+
+    <button class="btn-gen" onclick="generate()">GENERATE HALAMAN NILAI</button>
+</div>
+
+<div id="output"></div>
+
+<script>
+    // --- DATABASE & MEMORY ---
+    let dbCSV = [];
+    
+    // --- INITIALIZATION ---
+    window.onload = () => {
+        // Set Default Date Today
+        document.getElementById('cfg-m-date').value = new Date().toISOString().split('T')[0];
+        
+        // Load Auto-Save Data
+        const saved = JSON.parse(localStorage.getItem('ebtaq_005_mem')) || {};
+        if(saved.eventName) document.getElementById('cfg-event-name').value = saved.eventName;
+        if(saved.smartMonth) document.getElementById('cfg-smart-month').value = saved.smartMonth;
+        if(saved.hYear) document.getElementById('cfg-h-year').value = saved.hYear;
+        if(saved.signerName) document.getElementById('cfg-signer-name').value = saved.signerName;
+        if(saved.signerRole) document.getElementById('cfg-signer-role').value = saved.signerRole;
+        if(saved.scaleMode) {
+            document.getElementById('scale-toggle').checked = saved.scaleMode;
+            updateToggleText();
+        }
+    };
+
+    function updateToggleText() {
+        const isPuluhan = document.getElementById('scale-toggle').checked;
+        document.getElementById('toggle-status').innerText = isPuluhan ? "Puluhan (85)" : "Desimal (8.5)";
+    }
+
+    // --- CSV HANDLER ---
+    function readCSV() {
+        const file = document.getElementById('csv-input').files[0];
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const lines = e.target.result.split(/\r?\n/).filter(l => l.trim() !== "");
+            const headers = lines[0].split(';').map(h => h.replace(/"/g, '').trim().toUpperCase());
+            dbCSV = lines.slice(1).map(line => {
+                const cols = line.split(';').map(c => c.replace(/"/g, '').trim());
+                let obj = {}; cols.forEach((v, i) => { if(headers[i]) obj[headers[i]] = v; });
+                return obj;
+            });
+            alert("CSV Berhasil Dimuat: " + dbCSV.length + " Data Santri.");
+        };
+        reader.readAsText(file);
+    }
+
+    // --- HELPER FUNCTIONS ---
+    function formatTitleCase(str) {
+        if (!str) return "";
+        return str.toLowerCase().split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+    }
+
+    function formatMasehiDate(ds) {
+        if(!ds) return "";
+        const b = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+        const d = new Date(ds); 
+        return `${d.getDate()} ${b[d.getMonth()]} ${d.getFullYear()} M`;
+    }
+
+    // FUNGSI TERBILANG (Custom untuk Nilai)
+    function terbilang(x) {
+        const angka = ["", "Satu", "Dua", "Tiga", "Empat", "Lima", "Enam", "Tujuh", "Delapan", "Sembilan", "Sepuluh", "Sebelas"];
+        let n = Math.abs(x);
+        let hasil = "";
+
+        // Bagian Integer (Puluhan/Satuan)
+        let intPart = Math.floor(n);
+        let decPart = Math.round((n - intPart) * 100); // Ambil 2 digit desimal max
+
+        if (intPart < 12) {
+            hasil = " " + angka[intPart];
+        } else if (intPart < 20) {
+            hasil = terbilang(intPart - 10) + " Belas";
+        } else if (intPart < 100) {
+            hasil = terbilang(Math.floor(intPart / 10)) + " Puluh" + terbilang(intPart % 10);
+        } else if (intPart < 200) {
+            hasil = " Seratus" + terbilang(intPart - 100);
+        } else if (intPart < 1000) {
+            hasil = terbilang(Math.floor(intPart / 100)) + " Ratus" + terbilang(intPart % 100);
+        }
+
+        // Penanganan Desimal (Koma)
+        if (decPart > 0) {
+            // Jika mode desimal aktif, kita baca koma
+            // Cek apakah desimalnya puluhan (misal .50 -> 5) atau (.5 -> 5)
+             let decStr = n.toString().split('.')[1];
+             if(decStr) {
+                 hasil += " Koma";
+                 for(let char of decStr) {
+                     hasil += " " + angka[parseInt(char)];
+                 }
+             }
+        }
+
+        return hasil.trim();
+    }
+
+    // --- MAIN GENERATOR ---
+    function generate() {
+        if (dbCSV.length === 0) return alert("Upload CSV dulu!");
+
+        // 1. Ambil Nilai Form
+        const eventName = document.getElementById('cfg-event-name').value;
+        const smartMonthRaw = document.getElementById('cfg-smart-month').value;
+        const hYear = document.getElementById('cfg-h-year').value;
+        const mDateRaw = document.getElementById('cfg-m-date').value;
+        const signerName = document.getElementById('cfg-signer-name').value;
+        const signerRole = document.getElementById('cfg-signer-role').value;
+        const isPuluhan = document.getElementById('scale-toggle').checked;
+        const startSeq = document.getElementById('cfg-no-start').value;
+
+        // 2. Logika "Input Cerdas" Bulan
+        let periodName = smartMonthRaw;
+        let titiMonth = smartMonthRaw;
+        
+        if (smartMonthRaw.includes('/')) {
+            const parts = smartMonthRaw.split('/');
+            periodName = parts[0].trim();
+            titiMonth = parts[1].trim();
+        }
+
+        const fullTitimangsaH = `${titiMonth} ${hYear}`; // Misal: Sya'ban 1446 H
+        const fullTitimangsaM = formatMasehiDate(mDateRaw);
+
+        // 3. Save to LocalStorage
+        const saveData = {
+            eventName, smartMonth: smartMonthRaw, hYear, signerName, signerRole, scaleMode: isPuluhan
+        };
+        localStorage.setItem('ebtaq_005_mem', JSON.stringify(saveData));
+
+        // 4. Render
+        const out = document.getElementById('output');
+        out.innerHTML = "";
+        
+        let currentSeq = startSeq ? parseInt(startSeq) : null;
+
+        // Mapping Materi Tetap (Tujuan Ijazah vs Sumber CSV)
+        const mapMateri = [
+            { label: "Fashohah", key: "N. FSH" },
+            { label: "Tartil", key: "N. TRL" },
+            { label: "Tajwid", key: "N. TJW" },
+            { label: "Ghorib", key: "N. GRB" },
+            { label: "Hafalan Surat Pendek", key: "N. SSP" },
+            { label: "Do'a Harian", key: "N. DDH" },
+            { label: "Praktek Sholat", key: "N. SLT" },
+            { label: "Praktek Wudlu'", key: "N. WDL" }
+        ];
+
+        dbCSV.forEach((d, idx) => {
+            // Filter Lulus Only (Opsional, tapi biasanya Ijazah hanya yang L)
+            if(d['L / TL'] === 'TL' || d['L/TL'] === 'TL') return;
+
+            // A. Auto-Slice No EBTAQ
+            // Cari kolom No, jika manual seq gunakan itu
+            let rawNoStr = "";
+            if (currentSeq !== null) {
+                rawNoStr = String(currentSeq);
+                currentSeq++;
+            } else {
+                // Ambil dari CSV kolom No/No Ijazah. Logic: Ambil angka setelah titik terakhir
+                const sourceNo = d['NO.'] || d['NO'] || d['NO IJAZAH'] || "0000";
+                if(sourceNo.includes('.')) {
+                    rawNoStr = sourceNo.split('.').pop();
+                } else {
+                    rawNoStr = sourceNo;
+                }
+            }
+            const finalNoEbtaq = rawNoStr.padStart(4, '0'); // 0353
+
+            // B. Hitung Nilai
+            let totalNilai = 0;
+            let countMateri = 0;
+            let rowsHTML = "";
+
+            mapMateri.forEach((m, i) => {
+                let valRaw = d[m.key] || "0";
+                let valNum = parseFloat(valRaw.replace(',', '.'));
+                
+                // Logic Toggle Scale
+                let displayNum = 0;
+                let textTerbilang = "";
+
+                if (isPuluhan) {
+                    displayNum = Math.round(valNum * 10); // 8.5 -> 85
+                    textTerbilang = terbilang(displayNum);
+                } else {
+                    displayNum = valNum; // 8.5 -> 8.5
+                    textTerbilang = terbilang(displayNum);
+                }
+
+                totalNilai += displayNum;
+                countMateri++;
+
+                // Format Tampilan Angka di Tabel
+                let showVal = isPuluhan ? displayNum : displayNum.toString().replace('.', ',');
+
+                rowsHTML += `
+                <tr>
+                    <td class="col-no">${i+1}.</td>
+                    <td class="col-materi">${m.label}</td>
+                    <td class="col-angka">${showVal}</td>
+                    <td class="col-huruf">${textTerbilang}</td>
+                </tr>`;
+            });
+
+            // C. Kalkulasi Total & Rata-rata
+            let avg = totalNilai / countMateri;
+            // Rata-rata: Sisakan 2 digit, dibulatkan
+            // Trik rounding: Math.round(num * 100) / 100
+            let avgRounded = Math.round(avg * 100) / 100;
+
+            let showTotal = isPuluhan ? totalNilai : totalNilai.toString().replace('.', ',');
+            let showAvg = avgRounded.toString().replace('.', ',');
+            
+            // Terbilang Total & Rata
+            let textTotal = terbilang(totalNilai);
+            let textAvg = terbilang(avgRounded);
+
+            // D. Template
+            const page = document.createElement('div');
+            page.className = 'page-canvas';
+            page.innerHTML = `
+                <div class="printable-area">
+                    <div class="header-section">
+                        <div class="main-title">DAFTAR NILAI</div>
+                        <div class="sub-title">${eventName}</div>
+                        <div class="periode-title">PERIODE ${periodName} ${hYear} / ${new Date(mDateRaw).getFullYear()} M</div>
+                    </div>
+
+                    <div class="identity-box">
+                        <div>No. EBTAQ : ${finalNoEbtaq}</div>
+                        <div>Nama : ${formatTitleCase(d['NAMA LENGKAP'])}</div>
+                    </div>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Materi Tashih</th>
+                                    <th>Nilai (Angka)</th>
+                                    <th>Nilai (Huruf)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${rowsHTML}
+                                <tr class="row-total">
+                                    <td colspan="2" class="total-label">Total Nilai</td>
+                                    <td class="col-angka">${showTotal}</td>
+                                    <td class="col-huruf">${textTotal}</td>
+                                </tr>
+                                <tr class="row-total">
+                                    <td colspan="2" class="total-label">Rata - Rata</td>
+                                    <td class="col-angka">${showAvg}</td>
+                                    <td class="col-huruf">${textAvg}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="footer-section">
+                        <div class="sign-box">
+                            <div class="titimangsa">Demak, ${fullTitimangsaH}</div>
+                            <div class="hr-div"></div>
+                            <div class="titimangsa" style="margin-bottom:15px;">${fullTitimangsaM}</div>
+
+                            <div class="jabatan">${signerRole}</div>
+                            <div class="korcab">Korcab Qiroati Demak</div>
+                            <div class="pejabat">${signerName}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="page-info">Hal. ${idx+1} (Auto)</div>
+            `;
+
+            out.appendChild(page);
+        });
+    }
+</script>
+</body>
+</html>
