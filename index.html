@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Ijazah hal. 2 | Nilai - Skrip 005 v9</title>
+    <title>Ijazah hal. 2 | Nilai - Skrip 005 v11</title>
     <style>
         /* ================= SETTING KERTAS F4 ================= */
         @page { size: 215mm 330mm; margin: 0; }
@@ -13,7 +13,7 @@
             print-color-adjust: exact !important;
         }
 
-        /* ================= PANEL KONTROL (AESTHETIC V9) ================= */
+        /* ================= PANEL KONTROL (AESTHETIC V11) ================= */
         .control-panel {
             background: #fff; width: 215mm; margin: 20px auto;
             padding: 25px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
@@ -24,19 +24,19 @@
         .row { display: flex; gap: 12px; margin-bottom: 15px; align-items: flex-start; }
         .group { display: flex; flex-direction: column; gap: 6px; }
         
-        /* Konsistensi Label & Input */
         label { font-size: 11px; font-weight: bold; font-family: Arial; color: #444; text-transform: uppercase; white-space: nowrap; }
         
-        /* Menyeragamkan Tinggi Semua Input (40px) */
+        /* Tinggi Seragam 40px untuk semua Box */
         input[type="text"], input[type="number"], input[type="date"], input[type="file"], select { 
             height: 40px; padding: 0 10px; border: 1px solid #ccc; border-radius: 4px; 
             font-size: 13px; box-sizing: border-box; width: 100%; font-family: Arial, sans-serif;
         }
         input[type="file"] { padding: 8px 10px; }
 
-        .hint { font-size: 10px; color: #888; font-style: italic; min-height: 12px; font-family: Arial; }
+        /* Sinkronisasi Tinggi Hint agar Input Sejajar */
+        .hint { font-size: 10px; color: #888; font-style: italic; min-height: 14px; font-family: Arial; line-height: 1.2; }
 
-        /* Toggle Skala Nilai (Matching height 40px) */
+        /* Toggle Skala Nilai */
         .toggle-container { 
             display: flex; align-items: center; background: #f8f9fa; 
             padding: 0 12px; border-radius: 4px; border: 1px solid #ccc; 
@@ -92,6 +92,12 @@
         table.nilai-table th { border: 1px solid #000; padding: 4px; font-size: 12pt; text-align: center; font-weight: bold; height: 32px; vertical-align: middle; }
         table.nilai-table td { border: 1px solid #000; padding: 3px 6px; font-size: 12pt; height: 24px; vertical-align: middle; }
         
+        /* ALIGNMENT FIX */
+        .col-no { width: 40px; text-align: center; }
+        .col-materi { text-align: left; padding-left: 15px; }
+        .col-angka { width: 100px; text-align: center !important; font-weight: bold; }
+        .col-huruf { width: 250px; text-align: left; padding-left: 15px; font-style: italic; text-transform: capitalize; }
+
         .row-total { font-weight: bold; background-color: #f9f9f9; }
         .total-label { text-align: center; }
 
@@ -154,7 +160,8 @@
             <input type="date" id="cfg-m-date">
             <div class="hint">&nbsp;</div>
         </div>
-        <div class="group" style="flex: 0.6;"> <label>5. Tgl Hijriah</label>
+        <div class="group" style="flex: 0.8;">
+            <label>5. Tgl Hijriah</label>
             <input type="number" id="cfg-h-date" placeholder="12">
             <div class="hint">&nbsp;</div>
         </div>
@@ -163,7 +170,8 @@
             <input type="text" id="cfg-smart-month" placeholder="Cth: Rojab atau Rojab / Sya'ban">
             <div class="hint">Input Tunggal atau Ganda (/)</div>
         </div>
-        <div class="group" style="flex: 0.6;"> <label>7. Tahun Hijriah</label>
+        <div class="group" style="flex: 0.5;">
+            <label>7. Tahun Hijriah</label>
             <input type="number" id="cfg-h-year" placeholder="1447" min="1447">
             <div class="hint">Min. 1447</div>
         </div>
@@ -195,7 +203,7 @@
 
     window.onload = () => {
         document.getElementById('cfg-m-date').value = new Date().toISOString().split('T')[0];
-        const saved = JSON.parse(localStorage.getItem('ebtaq_005_v9_mem')) || {};
+        const saved = JSON.parse(localStorage.getItem('ebtaq_005_v11_mem')) || {};
         if(saved.eventName) document.getElementById('cfg-event-name').value = saved.eventName;
         if(saved.smartMonth) document.getElementById('cfg-smart-month').value = saved.smartMonth;
         if(saved.hDate) document.getElementById('cfg-h-date').value = saved.hDate;
@@ -243,22 +251,26 @@
         return `${d.getDate()} ${b[d.getMonth()]} ${d.getFullYear()} M`;
     }
 
+    // FUNGSI TERBILANG DENGAN PERBAIKAN SPASI RATUS & PULUH
     function terbilang(x) {
         const angka = ["", "Satu", "Dua", "Tiga", "Empat", "Lima", "Enam", "Tujuh", "Delapan", "Sembilan", "Sepuluh", "Sebelas"];
         let n = Math.abs(x);
         let hasil = "";
         let intPart = Math.floor(n);
         let decPart = Math.round((n - intPart) * 100);
+
         if (intPart < 12) { hasil = " " + angka[intPart]; }
-        else if (intPart < 20) { hasil = terbilang(intPart - 10) + " Belas"; }
-        else if (intPart < 100) { hasil = terbilang(Math.floor(intPart / 10)) + " Puluh" + terbilang(intPart % 10); }
-        else if (intPart < 200) { hasil = " Seratus" + terbilang(intPart - 100); }
-        else if (intPart < 1000) { hasil = terbilang(Math.floor(intPart / 100)) + " Ratus" + terbilang(intPart % 100); }
+        else if (intPart < 20) { hasil = terbilang(intPart - 10) + " Belas "; }
+        else if (intPart < 100) { hasil = terbilang(Math.floor(intPart / 10)) + " Puluh " + terbilang(intPart % 10); }
+        else if (intPart < 200) { hasil = " Seratus " + terbilang(intPart - 100); }
+        else if (intPart < 1000) { hasil = terbilang(Math.floor(intPart / 100)) + " Ratus " + terbilang(intPart % 100); }
+
         if (decPart > 0) {
              let decStr = n.toString().split('.')[1];
-             if(decStr) { hasil += " Koma"; for(let char of decStr) { hasil += " " + angka[parseInt(char)]; } }
+             if(decStr) { hasil += " Koma "; for(let char of decStr) { hasil += " " + angka[parseInt(char)] + " "; } }
         }
-        return hasil.trim();
+        // Bersihkan spasi ganda dan trim
+        return hasil.replace(/\s+/g, ' ').trim();
     }
 
     function generate() {
@@ -286,7 +298,7 @@
         const fullTitimangsaH = `${hDate} ${titiMonth} ${hYear} H`;
         const fullTitimangsaM = formatMasehiDate(mDateRaw);
 
-        localStorage.setItem('ebtaq_005_v9_mem', JSON.stringify({ eventName, smartMonth: smartMonthRaw, hDate, hYear, signerName, signerRole, scaleMode: isPuluhan }));
+        localStorage.setItem('ebtaq_005_v11_mem', JSON.stringify({ eventName, smartMonth: smartMonthRaw, hDate, hYear, signerName, signerRole, scaleMode: isPuluhan }));
 
         const filteredData = dbCSV.filter(d => d['ASAL LEMBAGA'] === targetLembaga && (d['L / TL'] === 'L' || d['L/TL'] === 'L'));
         const totalPages = filteredData.length;
