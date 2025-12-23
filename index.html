@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>HALAMAN NILAI (Skrip 005 v7 - Precision Layout)</title>
+    <title>Ijazah hal. 2 | Nilai - Skrip 005 v8</title>
     <style>
         /* ================= SETTING KERTAS F4 ================= */
         @page { size: 215mm 330mm; margin: 0; }
@@ -13,32 +13,45 @@
             print-color-adjust: exact !important;
         }
 
-        /* ================= PANEL KONTROL ================= */
+        /* ================= PANEL KONTROL (AESTHETIC V8) ================= */
         .control-panel {
             background: #fff; width: 215mm; margin: 20px auto;
-            padding: 20px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            padding: 25px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             display: block; box-sizing: border-box;
         }
-        .control-panel h3 { margin: 0 0 15px; color: #007bff; font-family: Arial; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        .control-panel h3 { margin: 0 0 15px; color: #007bff; font-family: Arial; border-bottom: 2px solid #eee; padding-bottom: 10px; font-size: 18px; }
         
-        .row { display: flex; gap: 15px; margin-bottom: 12px; align-items: flex-end; }
-        .group { flex: 1; display: flex; flex-direction: column; gap: 4px; }
-        label { font-size: 11px; font-weight: bold; font-family: Arial; color: #555; }
-        input, select { padding: 7px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px; }
-        .hint { font-size: 9px; color: #666; font-style: italic; margin-top: -2px; }
+        .row { display: flex; gap: 15px; margin-bottom: 15px; align-items: flex-start; }
+        .group { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+        
+        /* Konsistensi Label & Input */
+        label { font-size: 11px; font-weight: bold; font-family: Arial; color: #444; text-transform: uppercase; }
+        
+        /* Menyeragamkan Tinggi Semua Input (40px) */
+        input[type="text"], input[type="number"], input[type="date"], input[type="file"], select { 
+            height: 40px; padding: 0 10px; border: 1px solid #ccc; border-radius: 4px; 
+            font-size: 13px; box-sizing: border-box; width: 100%; font-family: Arial, sans-serif;
+        }
+        input[type="file"] { padding: 8px 10px; } /* Penyesuaian khusus file agar teks tidak terpotong */
 
-        /* Toggle Skala Nilai */
-        .toggle-container { display: flex; align-items: center; background: #f1f3f5; padding: 5px 10px; border-radius: 4px; border: 1px solid #ddd; height: 28px; }
-        .switch { position: relative; display: inline-block; width: 36px; height: 18px; margin: 0 8px; }
+        .hint { font-size: 10px; color: #888; font-style: italic; min-height: 12px; font-family: Arial; }
+
+        /* Toggle Skala Nilai (Matching height 40px) */
+        .toggle-container { 
+            display: flex; align-items: center; background: #f8f9fa; 
+            padding: 0 12px; border-radius: 4px; border: 1px solid #ccc; 
+            height: 40px; box-sizing: border-box;
+        }
+        .switch { position: relative; display: inline-block; width: 34px; height: 18px; margin: 0 10px; flex-shrink: 0; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 20px; }
         .slider:before { position: absolute; content: ""; height: 12px; width: 12px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
         input:checked + .slider { background-color: #28a745; }
-        input:checked + .slider:before { transform: translateX(18px); }
-        .status-text { font-size: 11px; font-weight: bold; color: #333; }
+        input:checked + .slider:before { transform: translateX(16px); }
+        .status-text { font-size: 12px; font-weight: bold; color: #333; white-space: nowrap; }
 
-        .btn-gen { width: 100%; padding: 12px; background: #007bff; color: #fff; border: none; cursor: pointer; font-weight: bold; border-radius: 4px; font-size: 15px; margin-top: 5px; transition: 0.3s; }
-        .btn-gen:hover { background: #0056b3; }
+        .btn-gen { width: 100%; padding: 15px; background: #28a745; color: #fff; border: none; cursor: pointer; font-weight: bold; border-radius: 4px; font-size: 16px; margin-top: 5px; transition: 0.3s; }
+        .btn-gen:hover { background: #218838; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
 
         /* ================= KANVAS HALAMAN CETAK ================= */
         .page-canvas {
@@ -50,99 +63,67 @@
             print-color-adjust: exact !important;
         }
         
-        /* LAPIS 1: AREA CETAK (Margin Fisik) */
         .printable-area {
             position: absolute;
             top: 0.5cm; right: 0.5cm; bottom: 0.5cm; left: 0.7cm; 
             background-image: url('Border belakang.png');
-            background-size: 100% 100%; /* Force Fit */
+            background-size: 100% 100%;
             background-repeat: no-repeat;
         }
 
-        /* LAPIS 2: KONTEN (Safe Zone Logo 8cm) */
         .content-overlay {
             position: relative; width: 100%; height: 100%;
-            padding: 8cm 2cm 0 2cm; /* Top 8cm */
+            padding: 8cm 2cm 0 2cm; 
             box-sizing: border-box; display: flex; flex-direction: column;
         }
         
-        /* HEADER */
         .header-section { text-align: center; margin-bottom: 10px; }
         .main-title { font-size: 16pt; font-weight: bold; text-transform: uppercase; margin-bottom: 0px; letter-spacing: 1px; }
         .sub-title { font-size: 14pt; font-weight: bold; text-transform: uppercase; margin-bottom: 2px; }
         .periode-title { font-size: 14pt; font-weight: bold; text-transform: uppercase; margin-bottom: 5px; }
 
-        /* IDENTITAS */
         .identity-table { margin-left: 20px; margin-bottom: 8px; font-size: 12pt; font-weight: bold; }
         .identity-table td { padding: 2px 0; vertical-align: top; border: none; }
         .label-cell { width: 110px; }
         .sep-cell { width: 15px; text-align: center; }
 
-        /* TABEL NILAI (Compact) */
         .table-container { margin-top: 5px; padding: 0 10px; }
         table.nilai-table { width: 100%; border-collapse: collapse; border: 2px solid #000; }
-        table.nilai-table th { border: 1px solid #000; padding: 4px; font-size: 12pt; text-align: center; font-weight: bold; height: 32px; vertical-align: middle; background-color: transparent; }
+        table.nilai-table th { border: 1px solid #000; padding: 4px; font-size: 12pt; text-align: center; font-weight: bold; height: 32px; vertical-align: middle; }
         table.nilai-table td { border: 1px solid #000; padding: 3px 6px; font-size: 12pt; height: 24px; vertical-align: middle; }
-        
-        .col-no { width: 40px; text-align: center; }
-        .col-materi { text-align: left; padding-left: 15px; }
-        .col-angka { width: 100px; text-align: center; font-weight: bold; }
-        .col-huruf { width: 250px; text-align: left; padding-left: 15px; font-style: italic; text-transform: capitalize; }
         
         .row-total { font-weight: bold; background-color: #f9f9f9; }
         .total-label { text-align: center; }
 
         /* ================= FOOTER PRECISION (8cm Width) ================= */
-        
-        /* Wrapper Utama: Lebar 8cm, Rata Kanan, Jarak 24pt */
         .footer-wrapper {
-            width: 8.0cm;           /* FIX: Lebar Maksimal 8cm */
-            margin-left: auto;      /* Dorong ke Kanan (Sejajar Tabel) */
-            margin-right: 10px;     /* Kompensasi padding tabel (agar lurus garis tabel) */
-            margin-top: 24pt;       /* FIX: Jarak 24pt dari Tabel */
-            /* border: 1px solid red; /* Debugging Line (Hapus nanti) */
+            width: 8.0cm;           
+            margin-left: auto;      
+            margin-right: 10px;     
+            margin-top: 24pt;       
             display: flex; 
             flex-direction: column; 
-            align-items: center;    /* Center semua isi dalam kotak 8cm */
+            align-items: center;    
         }
 
-        /* Baris 1: Titimangsa (Demak + Tanggal) */
         .date-row-combined {
             display: flex; 
             flex-direction: row;
-            align-items: center;    /* Center vertikal */
-            justify-content: center; /* Center horizontal dalam 8cm */
+            align-items: center;    
+            justify-content: center; 
             width: 100%;
             margin-bottom: 5px;
         }
 
-        .kota-text { 
-            margin-right: 8px; /* Jarak antara Demak dan Tanggal */
-            font-size: 12pt;
-            white-space: nowrap;
-        }
-
-        /* Stack Tanggal (Hijriah/Garis/Masehi) */
-        .date-stack { 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            font-size: 12pt; 
-        }
+        .kota-text { margin-right: 8px; font-size: 12pt; white-space: nowrap; }
+        .date-stack { display: flex; flex-direction: column; align-items: center; font-size: 12pt; }
         .hr-divider { width: 100%; min-width: 160px; height: 0; border-bottom: 1px solid black; margin: 3px 0; }
 
-        /* Baris 2: Tanda Tangan */
-        .sign-block {
-            width: 100%;
-            text-align: center;     /* Rata tengah dalam 8cm */
-            margin-top: 10px;
-        }
-        
+        .sign-block { width: 100%; text-align: center; margin-top: 10px; }
         .jabatan { font-size: 12pt; font-weight: bold; margin-bottom: 2px; }
-        .korcab { font-size: 12pt; font-weight: normal; margin-bottom: 75px; } /* Ruang TTD */
+        .korcab { font-size: 12pt; font-weight: normal; margin-bottom: 75px; } 
         .pejabat { font-size: 12pt; font-weight: bold; text-decoration: underline; }
 
-        /* INFO HALAMAN */
         .page-info { position: absolute; bottom: 5mm; right: 10mm; font-size: 9pt; color: #999; font-family: Arial; }
 
         @media print {
@@ -156,18 +137,20 @@
 <body>
 
 <div class="control-panel">
-    <h3>PANEL KONTROL HALAMAN NILAI - Skrip 005 v7 (Final Precision)</h3>
+    <h3>Ijazah hal. 2 | Nilai</h3>
     
     <div class="row">
         <div class="group" style="flex: 2;">
-            <label>1. Judul Kegiatan</label>
+            <label>1. Judul Kegiatan / Nama Acara</label>
             <input type="text" id="cfg-event-name" value="EVALUASI BELAJAR TAHAP AKHIR QIROATI (EBTAQ)">
+            <div class="hint">&nbsp;</div>
         </div>
         <div class="group" style="flex: 1.5;">
-            <label>2. Upload CSV (;)</label>
-            <input type="file" id="csv-input" accept=".csv" onchange="readCSV()">
+            <label>2. Upload file hasil penilaian</label>
+            <input type="file" id="csv-input" accept=".csv, .xls" onchange="readCSV()">
+            <div class="hint">Format file: .csv atau .xls</div>
         </div>
-        <div class="group" style="flex: 0.8;">
+        <div class="group" style="flex: 1;">
             <label>3. Skala Nilai</label>
             <div class="toggle-container">
                 <label class="switch">
@@ -176,6 +159,7 @@
                 </label>
                 <span class="status-text" id="toggle-status">Desimal</span>
             </div>
+            <div class="hint">(satuan / puluhan)</div>
         </div>
     </div>
 
@@ -183,33 +167,36 @@
         <div class="group">
             <label>4. Tgl Masehi</label>
             <input type="date" id="cfg-m-date">
+            <div class="hint">&nbsp;</div>
         </div>
-        <div class="group" style="flex: 0.5;">
-            <label>5. Tgl Hijriah (DD)</label>
+        <div class="group" style="flex: 0.4;">
+            <label>5. Tgl Hijriah</label>
             <input type="number" id="cfg-h-date" placeholder="12">
+            <div class="hint">&nbsp;</div>
         </div>
         <div class="group" style="flex: 1.5;">
             <label>6. Bulan Cerdas (Periode/Bulan)</label>
-            <input type="text" id="cfg-smart-month" placeholder="Cth: Rojab">
+            <input type="text" id="cfg-smart-month" placeholder="Cth: Rojab atau Rojab / Sya'ban">
             <div class="hint">Input Tunggal atau Ganda (/)</div>
         </div>
         <div class="group">
             <label>7. Tahun Hijriah</label>
             <input type="number" id="cfg-h-year" placeholder="1447" min="1447">
+            <div class="hint">Min. 1447</div>
         </div>
     </div>
 
     <div class="row">
         <div class="group" style="flex: 1.5;">
             <label>8. Pilih Lembaga</label>
-            <select id="sel-lembaga" disabled><option>-- Upload CSV Dulu --</option></select>
+            <select id="sel-lembaga" disabled><option value="">-- Upload File Dulu --</option></select>
         </div>
         <div class="group">
             <label>9. Nama Penanggung Jawab</label>
-            <input type="text" id="cfg-signer-name" placeholder="Nama Pejabat">
+            <input type="text" id="cfg-signer-name" placeholder="Ketua Pelaksana">
         </div>
         <div class="group">
-            <label>10. Jabatan (Default Otomatis)</label>
+            <label>10. Jabatan</label>
             <input type="text" id="cfg-signer-role" placeholder="Ketua Pelaksana EBTAQ">
         </div>
     </div>
@@ -225,7 +212,7 @@
 
     window.onload = () => {
         document.getElementById('cfg-m-date').value = new Date().toISOString().split('T')[0];
-        const saved = JSON.parse(localStorage.getItem('ebtaq_005_v7_mem')) || {};
+        const saved = JSON.parse(localStorage.getItem('ebtaq_005_v8_mem')) || {};
         if(saved.eventName) document.getElementById('cfg-event-name').value = saved.eventName;
         if(saved.smartMonth) document.getElementById('cfg-smart-month').value = saved.smartMonth;
         if(saved.hDate) document.getElementById('cfg-h-date').value = saved.hDate;
@@ -261,7 +248,7 @@
             sel.innerHTML = '<option value="">-- Pilih Lembaga --</option>';
             listLembaga.forEach(l => sel.innerHTML += `<option value="${l}">${l}</option>`);
             sel.disabled = false;
-            alert(`CSV Berhasil Dimuat: ${dbCSV.length} Data.`);
+            alert(`File Dimuat: ${dbCSV.length} Data Santri.`);
         };
         reader.readAsText(file);
     }
@@ -292,7 +279,7 @@
     }
 
     function generate() {
-        if (dbCSV.length === 0) return alert("Upload CSV dulu!");
+        if (dbCSV.length === 0) return alert("Upload file penilaian dulu!");
         const targetLembaga = document.getElementById('sel-lembaga').value;
         if (!targetLembaga) return alert("Pilih Lembaga dulu!");
 
@@ -302,9 +289,7 @@
         const hYear = document.getElementById('cfg-h-year').value;
         const mDateRaw = document.getElementById('cfg-m-date').value;
         const signerName = document.getElementById('cfg-signer-name').value;
-        let signerRole = document.getElementById('cfg-signer-role').value;
-        if(!signerRole) signerRole = DEFAULT_ROLE;
-
+        let signerRole = document.getElementById('cfg-signer-role').value || DEFAULT_ROLE;
         const isPuluhan = document.getElementById('scale-toggle').checked;
 
         let periodName = smartMonthRaw; 
@@ -318,8 +303,7 @@
         const fullTitimangsaH = `${hDate} ${titiMonth} ${hYear} H`;
         const fullTitimangsaM = formatMasehiDate(mDateRaw);
 
-        const saveData = { eventName, smartMonth: smartMonthRaw, hDate, hYear, signerName, signerRole, scaleMode: isPuluhan };
-        localStorage.setItem('ebtaq_005_v7_mem', JSON.stringify(saveData));
+        localStorage.setItem('ebtaq_005_v8_mem', JSON.stringify({ eventName, smartMonth: smartMonthRaw, hDate, hYear, signerName, signerRole, scaleMode: isPuluhan }));
 
         const filteredData = dbCSV.filter(d => d['ASAL LEMBAGA'] === targetLembaga && (d['L / TL'] === 'L' || d['L/TL'] === 'L'));
         const totalPages = filteredData.length;
@@ -393,7 +377,6 @@
                                     <div>${fullTitimangsaM}</div>
                                 </div>
                             </div>
-                            
                             <div class="sign-block">
                                 <div class="jabatan">${signerRole}</div>
                                 <div class="korcab">Korcab Qiroati Demak</div>
