@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Ijazah hal. 2 | Nilai - Skrip 005 v8</title>
+    <title>Ijazah hal. 2 | Nilai - Skrip 005 v9</title>
     <style>
         /* ================= SETTING KERTAS F4 ================= */
         @page { size: 215mm 330mm; margin: 0; }
@@ -13,7 +13,7 @@
             print-color-adjust: exact !important;
         }
 
-        /* ================= PANEL KONTROL (AESTHETIC V8) ================= */
+        /* ================= PANEL KONTROL (AESTHETIC V9) ================= */
         .control-panel {
             background: #fff; width: 215mm; margin: 20px auto;
             padding: 25px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
@@ -21,18 +21,18 @@
         }
         .control-panel h3 { margin: 0 0 15px; color: #007bff; font-family: Arial; border-bottom: 2px solid #eee; padding-bottom: 10px; font-size: 18px; }
         
-        .row { display: flex; gap: 15px; margin-bottom: 15px; align-items: flex-start; }
-        .group { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+        .row { display: flex; gap: 12px; margin-bottom: 15px; align-items: flex-start; }
+        .group { display: flex; flex-direction: column; gap: 6px; }
         
         /* Konsistensi Label & Input */
-        label { font-size: 11px; font-weight: bold; font-family: Arial; color: #444; text-transform: uppercase; }
+        label { font-size: 11px; font-weight: bold; font-family: Arial; color: #444; text-transform: uppercase; white-space: nowrap; }
         
         /* Menyeragamkan Tinggi Semua Input (40px) */
         input[type="text"], input[type="number"], input[type="date"], input[type="file"], select { 
             height: 40px; padding: 0 10px; border: 1px solid #ccc; border-radius: 4px; 
             font-size: 13px; box-sizing: border-box; width: 100%; font-family: Arial, sans-serif;
         }
-        input[type="file"] { padding: 8px 10px; } /* Penyesuaian khusus file agar teks tidak terpotong */
+        input[type="file"] { padding: 8px 10px; }
 
         .hint { font-size: 10px; color: #888; font-style: italic; min-height: 12px; font-family: Arial; }
 
@@ -95,26 +95,11 @@
         .row-total { font-weight: bold; background-color: #f9f9f9; }
         .total-label { text-align: center; }
 
-        /* ================= FOOTER PRECISION (8cm Width) ================= */
         .footer-wrapper {
-            width: 8.0cm;           
-            margin-left: auto;      
-            margin-right: 10px;     
-            margin-top: 24pt;       
-            display: flex; 
-            flex-direction: column; 
-            align-items: center;    
+            width: 8.0cm; margin-left: auto; margin-right: 10px; margin-top: 24pt;       
+            display: flex; flex-direction: column; align-items: center;    
         }
-
-        .date-row-combined {
-            display: flex; 
-            flex-direction: row;
-            align-items: center;    
-            justify-content: center; 
-            width: 100%;
-            margin-bottom: 5px;
-        }
-
+        .date-row-combined { display: flex; flex-direction: row; align-items: center; justify-content: center; width: 100%; margin-bottom: 5px; }
         .kota-text { margin-right: 8px; font-size: 12pt; white-space: nowrap; }
         .date-stack { display: flex; flex-direction: column; align-items: center; font-size: 12pt; }
         .hr-divider { width: 100%; min-width: 160px; height: 0; border-bottom: 1px solid black; margin: 3px 0; }
@@ -164,13 +149,12 @@
     </div>
 
     <div class="row">
-        <div class="group">
+        <div class="group" style="flex: 0.8;">
             <label>4. Tgl Masehi</label>
             <input type="date" id="cfg-m-date">
             <div class="hint">&nbsp;</div>
         </div>
-        <div class="group" style="flex: 0.4;">
-            <label>5. Tgl Hijriah</label>
+        <div class="group" style="flex: 0.6;"> <label>5. Tgl Hijriah</label>
             <input type="number" id="cfg-h-date" placeholder="12">
             <div class="hint">&nbsp;</div>
         </div>
@@ -179,8 +163,7 @@
             <input type="text" id="cfg-smart-month" placeholder="Cth: Rojab atau Rojab / Sya'ban">
             <div class="hint">Input Tunggal atau Ganda (/)</div>
         </div>
-        <div class="group">
-            <label>7. Tahun Hijriah</label>
+        <div class="group" style="flex: 0.6;"> <label>7. Tahun Hijriah</label>
             <input type="number" id="cfg-h-year" placeholder="1447" min="1447">
             <div class="hint">Min. 1447</div>
         </div>
@@ -212,7 +195,7 @@
 
     window.onload = () => {
         document.getElementById('cfg-m-date').value = new Date().toISOString().split('T')[0];
-        const saved = JSON.parse(localStorage.getItem('ebtaq_005_v8_mem')) || {};
+        const saved = JSON.parse(localStorage.getItem('ebtaq_005_v9_mem')) || {};
         if(saved.eventName) document.getElementById('cfg-event-name').value = saved.eventName;
         if(saved.smartMonth) document.getElementById('cfg-smart-month').value = saved.smartMonth;
         if(saved.hDate) document.getElementById('cfg-h-date').value = saved.hDate;
@@ -303,7 +286,7 @@
         const fullTitimangsaH = `${hDate} ${titiMonth} ${hYear} H`;
         const fullTitimangsaM = formatMasehiDate(mDateRaw);
 
-        localStorage.setItem('ebtaq_005_v8_mem', JSON.stringify({ eventName, smartMonth: smartMonthRaw, hDate, hYear, signerName, signerRole, scaleMode: isPuluhan }));
+        localStorage.setItem('ebtaq_005_v9_mem', JSON.stringify({ eventName, smartMonth: smartMonthRaw, hDate, hYear, signerName, signerRole, scaleMode: isPuluhan }));
 
         const filteredData = dbCSV.filter(d => d['ASAL LEMBAGA'] === targetLembaga && (d['L / TL'] === 'L' || d['L/TL'] === 'L'));
         const totalPages = filteredData.length;
