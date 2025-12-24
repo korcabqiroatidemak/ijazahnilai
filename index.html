@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Ijazah hal. 2 | Nilai</title>
+    <title>Ijazah hal. 2 | Nilai (Final Alert)</title>
     <style>
         /* ================= SETTING KERTAS F4 ================= */
         @page { size: 215mm 330mm; margin: 0; }
@@ -13,7 +13,7 @@
             print-color-adjust: exact !important;
         }
 
-        /* ================= PANEL KONTROL (AESTHETIC V11) ================= */
+        /* ================= PANEL KONTROL (AESTHETIC V12) ================= */
         .control-panel {
             background: #fff; width: 215mm; margin: 20px auto;
             padding: 25px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
@@ -203,7 +203,7 @@
 
     window.onload = () => {
         document.getElementById('cfg-m-date').value = new Date().toISOString().split('T')[0];
-        const saved = JSON.parse(localStorage.getItem('ebtaq_005_v11_mem')) || {};
+        const saved = JSON.parse(localStorage.getItem('ebtaq_005_v12_mem')) || {};
         if(saved.eventName) document.getElementById('cfg-event-name').value = saved.eventName;
         if(saved.smartMonth) document.getElementById('cfg-smart-month').value = saved.smartMonth;
         if(saved.hDate) document.getElementById('cfg-h-date').value = saved.hDate;
@@ -251,7 +251,7 @@
         return `${d.getDate()} ${b[d.getMonth()]} ${d.getFullYear()} M`;
     }
 
-    // FUNGSI TERBILANG DENGAN PERBAIKAN SPASI RATUS & PULUH
+    // FUNGSI TERBILANG
     function terbilang(x) {
         const angka = ["", "Satu", "Dua", "Tiga", "Empat", "Lima", "Enam", "Tujuh", "Delapan", "Sembilan", "Sepuluh", "Sebelas"];
         let n = Math.abs(x);
@@ -269,7 +269,6 @@
              let decStr = n.toString().split('.')[1];
              if(decStr) { hasil += " Koma "; for(let char of decStr) { hasil += " " + angka[parseInt(char)] + " "; } }
         }
-        // Bersihkan spasi ganda dan trim
         return hasil.replace(/\s+/g, ' ').trim();
     }
 
@@ -298,12 +297,18 @@
         const fullTitimangsaH = `${hDate} ${titiMonth} ${hYear} H`;
         const fullTitimangsaM = formatMasehiDate(mDateRaw);
 
-        localStorage.setItem('ebtaq_005_v11_mem', JSON.stringify({ eventName, smartMonth: smartMonthRaw, hDate, hYear, signerName, signerRole, scaleMode: isPuluhan }));
+        localStorage.setItem('ebtaq_005_v12_mem', JSON.stringify({ eventName, smartMonth: smartMonthRaw, hDate, hYear, signerName, signerRole, scaleMode: isPuluhan }));
 
         const filteredData = dbCSV.filter(d => d['ASAL LEMBAGA'] === targetLembaga && (d['L / TL'] === 'L' || d['L/TL'] === 'L'));
         const totalPages = filteredData.length;
         const out = document.getElementById('output');
         out.innerHTML = "";
+
+        // NEW: ALERT JIKA KOSONG
+        if (totalPages === 0) {
+            alert(`MOHON MAAF!\n\nTidak ada data nilai yang ditemukan untuk lembaga:\n${targetLembaga}\n\nPastikan kolom "L / TL" berisi "L" (Lulus).`);
+            return;
+        }
 
         const mapMateri = [
             { label: "Fashohah", key: "N. FSH" }, { label: "Tartil", key: "N. TRL" },
@@ -384,6 +389,11 @@
                 <div class="page-info">Halaman ${idx+1} dari ${totalPages}</div>`;
             out.appendChild(page);
         });
+
+        // NEW: ALERT SUKSES
+        setTimeout(() => {
+            alert(`ALHAMDULILLAH!\n\nBerhasil membuat ${totalPages} Halaman Nilai untuk:\n${targetLembaga}`);
+        }, 300);
     }
 </script>
 </body>
